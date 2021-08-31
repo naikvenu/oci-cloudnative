@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Autonomous Transaction Processing on MuShop</title>
+    <link>/tags/autonomous-transaction-processing/</link>
+    <description>Recent content in Autonomous Transaction Processing on MuShop</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 10 Aug 2021 13:29:23 -0600</lastBuildDate><atom:link href="/tags/autonomous-transaction-processing/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Setup</title>
+      <link>/disaster-recovery/setup/</link>
+      <pubDate>Tue, 10 Aug 2021 13:29:23 -0600</pubDate>
+      
+      <guid>/disaster-recovery/setup/</guid>
+      <description>Introduction In this section we detail the steps required to perform a DR solution between ap-mumbai-1 and ap-hyderabad-1 regions. These regions are used as an example, you can choose the regions of your choice.
+Set Environment Variables export COMPARTMENT_ID=Your_compartment_id export DB_NAME=demoadb export DB_DISPLAY_NAME=demoadb export DB_PASSWORD=DemoAdb#1234 export WALLET_PW=DemoAdb#1234 export WALLET_ZIP=/tmp/Wallet_${DB_NAME}.zip  Setup ADB (Autonomous Database)   Create the Source ADB (Autonomous Database)
+ oci db autonomous-database create --compartment-id ${COMPARTMENT_ID} --db-name ${DB_NAME} --admin-password ${DB_PASSWORD} --db-version 19c --cpu-core-count 1 --data-storage-size-in-tbs 1 --display-name ${DB_DISPLAY_NAME}   Fetch the Source ADB (Autonomous Database) OCID</description>
+    </item>
+    
+  </channel>
+</rss>
