@@ -675,12 +675,10 @@
       <ul>
         <li><a href="#introduction">Introduction</a></li>
         <li><a href="#scenario-details">Scenario Details</a></li>
+        <li><a href="#procedure">Procedure</a></li>
         <li><a href="#steps">Steps</a></li>
-      </ul>
-    </li>
-    <li><a href="#dr-testing">DR Testing</a></li>
-    <li><a href="#waf-and-dns-traffic-steering">WAF and DNS traffic steering</a>
-      <ul>
+        <li><a href="#dr-testing">DR Testing</a></li>
+        <li><a href="#waf-and-dns-traffic-steering">WAF and DNS traffic steering</a></li>
         <li><a href="#next">Next</a></li>
       </ul>
     </li>
@@ -707,44 +705,61 @@
               
   
     <h2 id="introduction">Introduction</h2>
-<p>In this section we will cover the disaster recovery solution for MuShop deployed on OCI (Oracle Cloud Infrastructure).
-We will use the recently announced <a href="https://blogs.oracle.com/datawarehousing/cross-region-autonomous-data-guard-your-complete-autonomous-database-disaster-recovery-solution">Cross-Region Autonomous Data Guard for Autonomous databases</a> feature to demonstrate the DR (Disaster Recovery) solution.</p>
+<p>In this section let us discuss and implement the disaster recovery solution for
+MuShop deployed on OCI (Oracle Cloud Infrastructure) using the recently announced
+<a href="https://blogs.oracle.com/datawarehousing/cross-region-autonomous-data-guard-your-complete-autonomous-database-disaster-recovery-solution">Cross-Region Autonomous Data Guard for Autonomous databases</a>
+feature to demonstrate the DR (Disaster Recovery) solution.</p>
 <p><img src="../observability/images/disaster-recovery.png" alt="disaster-recovery"></p>
 <h2 id="scenario-details">Scenario Details</h2>
-<p>The above picture shows MuShop (polyglot microservices demo application) deployed on OKE (Oracle Cloud Infrastructure Container Engine for Kubernetes) clusters on ap-mumbai-1 (Primary) and ap-hyderabad-1 (DR) regions (These regions are used as an example). The Autonomous data guard is enabled between the two Autonomous databases across these two regions. If you need to refresh some concepts on Autonomous Data Guard, we suggest you to refer <a href="https://blogs.oracle.com/datawarehousing/cross-region-autonomous-data-guard-your-complete-autonomous-database-disaster-recovery-solution">this</a>. Finally, we will use the OCI DNS traffic steering to DNS failover to DR in case of disaster at the Primary site.</p>
-<p>We will introduce the Primary site failure by doing a manual failover of Autonomous database at source and the MuShop application at the DR would then take over and serve the users by connecting to the DR ADB (Autonomous Database).</p>
+<p>The above picture shows MuShop (polyglot microservices demo application) deployed
+on OKE (Oracle Cloud Infrastructure Container Engine for Kubernetes) clusters on
+<code>us-phoenix-1</code> (Primary) and <code>us-ashburn-1</code> (DR) regions (These regions are used here as an example).
+The Autonomous data guard is enabled between the two Autonomous databases across these two regions.
+If you need to refresh some concepts on Autonomous Data Guard, suggest you refer to <a href="https://blogs.oracle.com/datawarehousing/cross-region-autonomous-data-guard-your-complete-autonomous-database-disaster-recovery-solution">this</a> blog.
+Finally, we will use the OCI DNS traffic steering to DNS failover to DR in case of disaster at the Primary site.</p>
+<h2 id="procedure">Procedure</h2>
+<p>Induce the Primary site failure by doing a manual failover of
+Autonomous database at source and the MuShop application at the DR would
+then take over and serve the users by connecting to the DR ADB (Autonomous Database).</p>
 <h2 id="steps">Steps</h2>
-<p>For this example we shall consider ap-mumbai-1 as the source and ap-hyderabad-1 as the destination.
+<p>For this example we shall consider <code>us-phoenix-1</code> as the source and <code>us-ashburn-1</code> as the destination.
 The detailed steps are covered <a href="../disaster-recovery/setup/">here</a>. Below are the steps at a high level:</p>
 <ul>
 <li>
 <p>Create the Source and DR ATP (Autonomous transaction processing) databases.</p>
 </li>
 <li>
-<p>Create OKE clusters on both primary (ap-mumbai-1) and DR (ap-hyderabad-1) sites.</p>
+<p>Create OKE clusters on both primary (<code>us-phoenix-1</code>) and DR (<code>us-ashburn-1</code>) sites.</p>
 </li>
 <li>
-<p>Deploy MuShop on both Primary Site (ap-mumbai-1).</p>
+<p>Deploy MuShop on both Primary Site (<code>us-phoenix-1</code>).</p>
 </li>
 <li>
-<p>Verify the application working at the source (ap-mumbai-1). Access http://Ingress-Source-IP-Address and ensure that you would see the all the MuShop catalogue products listed without errors.</p>
+<p>Verify the application working at the source (<code>us-phoenix-1</code>). Access <code>https://&lt;primary-site-ingress-ip-address&gt;/api/catalogue</code> and ensure that you would see the all the MuShop catalogue products listed without errors.</p>
 </li>
 <li>
-<p>Perform ADB failover from ap-mumbai-1 to ap-hyderabad-1. We need to do this because the ADB needs to be available at the DR site for the MuShop pods to perform the initialization when we setup Mushop at the DR site. Else the pods would be stuck in the initialization state.</p>
+<p>Perform ADB failover from <code>us-phoenix-1</code> to <code>us-ashburn-1</code>. We need to do this because the ADB needs to be available at the DR site for the MuShop pods to perform the initialization when we setup MuShop at the DR site. Else the pods would be stuck in the initialization state.</p>
 </li>
 <li>
-<p>Setup MuShop on DR site (ap-hyderabad-1). When we setup the MuShop at DR it would not re-initialize the DB schemas or tables. This intelligence has to be built in the application.</p>
+<p>Setup MuShop on DR site (<code>us-ashburn-1</code>). When we setup the MuShop at DR it would not re-initialize the DB schemas or tables. This intelligence has to be built in the application.</p>
 </li>
 <li>
-<p>Verify the application working at the DR region (ap-hyderabad-1). Access http://Ingress-DR-IP-Address and ensure that you would see the all the MuShop catalogue products listed without errors.</p>
+<p>Verify the application working at the DR region (<code>us-ashburn-1</code>). Access <code>https://&lt;dr-site-ingress-ip-address&gt;/api/catalogue</code> and ensure that you would see the all the MuShop catalogue products listed without errors.</p>
 </li>
 </ul>
 <p>At this point the setup is ready to perform DR testing.</p>
-<h1 id="dr-testing">DR Testing</h1>
-<p>We will notice that the source site has lost access to all the products within Mushop and the DR site has access to all the products as we switched over.</p>
-<p>You can then switch back to the primary site (ap-mumbai-1) in this case and observe the opposite behavior.</p>
-<h1 id="waf-and-dns-traffic-steering">WAF and DNS traffic steering</h1>
-<p>Further, we  add WAF and DNS traffic steering policy to automatically switch the DNS from Source site to Destination site. For this we make use of creating a http healthcheck monitor on https://Source-Ingress-IP/api/catalogue. When we failover the ATP (Autonomous Database) manually or when there is a disaster at Primary site, this check would then fail and automatically change the DNS to point to DR Ingress IP.</p>
+<h2 id="dr-testing">DR Testing</h2>
+<p>Notice that the source site has lost access to all the products within
+MuShop and the DR site has access to all the products as the ADB was switched over.</p>
+<p>You can then switch back to the primary site (<code>us-phoenix-1</code>) in this case and
+observe the opposite behavior.</p>
+<h2 id="waf-and-dns-traffic-steering">WAF and DNS traffic steering</h2>
+<p>Further, we add WAF and DNS traffic steering policy to automatically switch
+the DNS from Source site to Destination site. For this we make use of creating
+a http healthcheck monitor on <code>https://&lt;primary-site-ingress-ip-address&gt;/api/catalogue</code>.
+When we failover the ATP (Autonomous Database) manually or when there is a
+disaster at Primary site, this check would then fail and automatically change
+the DNS to point to DR Ingress IP.</p>
 <h2 id="next">Next</h2>
 
   
