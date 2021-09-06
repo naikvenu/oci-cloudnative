@@ -836,7 +836,8 @@ oadbConnectionSecret: oadb-connection # Name of connection secret created earlie
 </span><span class="se"></span>mymushop mushop -n mushop
 </code></pre></div></li>
 <li>
-<p>Setup the ingress</p>
+<p>Setup the ingress
+A TLS secret is used for SSL termination on the ingress controller. To generate the secret for this example, a self-signed certificate is used. While this is okay for testing, for production, use a certificate signed by a Certificate Authority.</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">openssl req -x509 -nodes -days <span class="m">365</span> <span class="se">\
 </span><span class="se"></span>-newkey rsa:2048 -keyout tls.key <span class="se">\
 </span><span class="se"></span>-out tls.crt -subj <span class="s2">&#34;/CN=nginxsvc/O=nginxsvc&#34;</span>
