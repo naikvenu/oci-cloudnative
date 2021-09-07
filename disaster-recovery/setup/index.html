@@ -843,21 +843,25 @@ A TLS secret is used for SSL termination on the ingress controller. To generate 
 </span><span class="se"></span>-out tls.crt -subj <span class="s2">&#34;/CN=nginxsvc/O=nginxsvc&#34;</span>
 </code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">kubectl create secret tls tls-secret --key tls.key --cert tls.crt -n mushop
 </code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">cat <span class="s">&lt;&lt; EOF | kubectl -n mushop apply -f -
-</span><span class="s">apiVersion: networking.k8s.io/v1beta1
+</span><span class="s">apiVersion: networking.k8s.io/v1
 </span><span class="s">kind: Ingress
 </span><span class="s">metadata:
-</span><span class="s">name: mushop
-</span><span class="s">annotations:
+</span><span class="s">  name: mushop
+</span><span class="s">  annotations:
 </span><span class="s">    kubernetes.io/ingress.class: &#34;nginx&#34;
 </span><span class="s">spec:
-</span><span class="s">tls:
-</span><span class="s">- secretName: tls-secret
-</span><span class="s">rules:
-</span><span class="s">- http:
-</span><span class="s">    paths:
-</span><span class="s">    - backend:
-</span><span class="s">        serviceName: edge
-</span><span class="s">        servicePort: 80
+</span><span class="s">  tls:
+</span><span class="s">  - secretName: tls-secret
+</span><span class="s">  rules:
+</span><span class="s">  - http:
+</span><span class="s">      paths:
+</span><span class="s">      - path: /
+</span><span class="s">        pathType: Prefix
+</span><span class="s">        backend:
+</span><span class="s">          service:
+</span><span class="s">            name: edge
+</span><span class="s">            port: 
+</span><span class="s">              number: 80
 </span><span class="s">EOF</span>
 </code></pre></div></li>
 <li>
@@ -932,21 +936,25 @@ oadbConnectionSecret: oadb-connection # Name of connection secret created earlie
 </code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">kubectl create secret tls <span class="se">\
 </span><span class="se"></span>tls-secret --key tls.key --cert tls.crt -n mushop
 </code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">cat <span class="s">&lt;&lt; EOF | kubectl -n mushop apply -f -
-</span><span class="s">apiVersion: networking.k8s.io/v1beta1
+</span><span class="s">apiVersion: networking.k8s.io/v1
 </span><span class="s">kind: Ingress
 </span><span class="s">metadata:
-</span><span class="s">name: mushop
-</span><span class="s">annotations:
+</span><span class="s">  name: mushop
+</span><span class="s">  annotations:
 </span><span class="s">    kubernetes.io/ingress.class: &#34;nginx&#34;
 </span><span class="s">spec:
-</span><span class="s">tls:
-</span><span class="s">- secretName: tls-secret
-</span><span class="s">rules:
-</span><span class="s">- http:
-</span><span class="s">    paths:
-</span><span class="s">    - backend:
-</span><span class="s">        serviceName: edge
-</span><span class="s">        servicePort: 80
+</span><span class="s">  tls:
+</span><span class="s">  - secretName: tls-secret
+</span><span class="s">  rules:
+</span><span class="s">  - http:
+</span><span class="s">      paths:
+</span><span class="s">      - path: /
+</span><span class="s">        pathType: Prefix
+</span><span class="s">        backend:
+</span><span class="s">          service:
+</span><span class="s">            name: edge
+</span><span class="s">            port: 
+</span><span class="s">              number: 80
 </span><span class="s">EOF</span>
 </code></pre></div></li>
 </ul>
